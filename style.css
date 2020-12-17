@@ -1,0 +1,56 @@
+body {
+    background-color: purple;
+    color: silver;
+    font-family: "Georgia", Serif;
+}
+
+p {
+    text-indent: 5vmin;
+}
+
+a {
+    color: goldenrod;
+}
+
+a:hover {
+    color: gold;
+}
+
+button {
+    padding: 0.5%;
+
+    font-family: "Georgia", Serif;
+    font-weight: bold;
+    font-size: 3vmin;
+
+    color: purple;
+    background-color: goldenrod;
+}
+
+button:hover {
+    background-color: gold;
+}
+
+.row {
+    margin-left: 25%;
+}
+
+.column {
+    float: left;
+    width: 33%;
+}
+
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.centered {
+    text-align: center;
+    align-items: center;
+}
+
+#canvas {
+    display: none;
+}
