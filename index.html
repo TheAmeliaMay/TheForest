@@ -9,7 +9,7 @@
 <body>
     <div id="game_container" class="centered">
         <h1>The Forest</h1>
-        <h3>Alpha 1.0 — <a href="https://forms.gle/8AXVjWiLVwinWLBy7" target="_blank">Give Feedback</a></h3>
+        <h3>Alpha 1.1 — <a href="https://forms.gle/8AXVjWiLVwinWLBy7" target="_blank">Give Feedback</a></h3>
         <button id="startBtn" onclick="startGame();">Click to play!</button>
         <canvas id="canvas" width="1250vmin" height="700vmin">Loading...</canvas><br><br>
     </div>
@@ -57,12 +57,14 @@
 
         var width = height = scale = playerSize = blockSize = time = 0;
         var paused = false;
+        const berryTime = 20000;
+        const treeTime = 50000;
 
         //depletion rates
         const dehydration = 0.001;
         const thirst = 0.01;
-        const hunger = 0.005;
-        const cooling = 0.003;
+        const hunger = 0.0075;
+        const cooling = 0.005;
 
         //colors
         const bgColor = '#000000'; //black
@@ -558,7 +560,7 @@
         }
 
         class Bush {
-            constructor(x, y, bColor=berryColor, age=10000, fullAge=10000) {
+            constructor(x, y, bColor=berryColor, age=berryTime, fullAge=berryTime) {
                 this.x = x;
                 this.y = y;
                 this.w = this.h = blockSize;
@@ -669,7 +671,7 @@
         }
 
         class Tree {
-            constructor(x, y, age=10000, fullAge=10000, ) {
+            constructor(x, y, age=treeTime, fullAge=treeTime, ) {
                 this.x = x;
                 this.y = y;
                 this.w = this.h = blockSize; //maximum width
@@ -693,6 +695,9 @@
                     var x = this.x;
                     var y = this.y;
                 }
+
+                //draw a shadow
+                fillRect(invColor, this.x, this.y, this.w, this.h);
 
                 //draw the trunk
                 fillRect(this.color, x, y, w, h);
