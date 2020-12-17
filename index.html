@@ -9,7 +9,7 @@
 <body>
     <div id="game_container" class="centered">
         <h1>The Forest</h1>
-        <h3>Alpha 1.1 — <a href="https://forms.gle/8AXVjWiLVwinWLBy7" target="_blank">Give Feedback</a></h3>
+        <h3>Alpha 1.2 — <a href="https://forms.gle/8AXVjWiLVwinWLBy7" target="_blank">Give Feedback</a></h3>
         <button id="startBtn" onclick="startGame();">Click to play!</button>
         <canvas id="canvas" width="1250vmin" height="700vmin">Loading...</canvas><br><br>
     </div>
@@ -232,7 +232,7 @@
                 if (this.items[item] === undefined) {
                     this.items[item] = 0;
                 } else {
-                    this.items[item] -= n
+                    this.items[item] -= n;
                 }
             }
 
@@ -240,7 +240,7 @@
                 if (this.items[item] === undefined) {
                     this.items[item] = n;
                 } else {
-                    this.items[item] += n
+                    this.items[item] += n;
                 }
 
                 if (this.items[item] > this.max[item]) {
@@ -407,23 +407,6 @@
                     alert('You died of hypothermia! Tip: stand by the fire to recover warmth.')
                 }
 
-                //prevent collision with campFire or any trees
-                var newX = this.x + this.velX;
-                var newY = this.y + this.velY;
-                
-                var dummy = new Dummy(newX, newY, this.w, this.h);
-
-                if (collide(dummy, campFire)) {
-                    this.velX = this.velY = 0;
-                }
-
-                for (let i = 0; i < trees.length; i++) {
-                    let tree = trees[i];
-                    if (collide(dummy, tree)) {
-                        this.velX = this.velY = 0;
-                    }
-                }
-
                 //check if in a liquid
                 this.inLiq = false;
                 for (let i = 0; i < liquids.length; i++) {
@@ -443,6 +426,20 @@
                 this.x += this.velX;
                 this.y += this.velY;
 
+                //prevent collision with campFire or any trees
+                if (collide(this, campFire)) {
+                    this.x += this.velX * -5;
+                    this.y += this.velY * -5;
+                }
+
+                for (let i = 0; i < trees.length; i++) {
+                    let tree = trees[i];
+                    if (collide(this, tree)) {
+                        this.x += this.velX * -5;
+                        this.y += this.velY * -5;
+                    }
+                }
+
                 //reset velocity
                 this.velX = this.velY = 0;
 
@@ -451,10 +448,17 @@
                 if (this.y < 0) { this.y = 0 } else if (this.y + this.h > height) { this.y = height - this.h }
             }
 
+            facingLiq() {
+                for (let i = 0; i < liquids.length; i++) {
+                    if (collide(this.getFace(), liquids[i])) { return true }
+                }
+                return false;
+            }
+
             drink() {
                 if (this.waterAmnt > 75) { return }
 
-                if (this.inLiq || function() { for (let i = 0; i < liquids.length; i++) { if (collide(this, liquids[i])) { return true; } } }) {
+                if (this.inLiq || this.facingLiq()) {
                     this.waterAmnt += 25; //replenish 1/4
                 } else if (this.inv.has('water')) {
                     this.inv.remove('water');
@@ -671,10 +675,10 @@
         }
 
         class Tree {
-            constructor(x, y, age=treeTime, fullAge=treeTime, ) {
-                this.x = x;
-                this.y = y;
-                this.w = this.h = blockSize; //maximum width
+            constructor(fullX, fullY, age=treeTime, fullAge=treeTime, ) {
+                this.x = this.fullX = fullX;
+                this.y = this.fullY = fullY;
+                this.w = this.h = this.fullW = this.fullH = blockSize;
 
                 this.color = woodColor;
                 this.leafColor = bushColor;
@@ -685,25 +689,22 @@
 
             draw() {
                 if (this.age < this.fullAge) {
-                    var w = Math.round(this.w * (this.age / this.fullAge));
-                    var h = Math.round(this.h * (this.age / this.fullAge));
-                    var x = this.x + (this.w - w) / 2;
-                    var y = this.y + (this.h - h) / 2;
+                    this.w = Math.round(this.fullW * (this.age / this.fullAge));
+                    this.h = Math.round(this.fullH * (this.age / this.fullAge));
+                    this.x = this.fullX + (this.fullW - this.w) / 2;
+                    this.y = this.fullY + (this.fullH - this.h) / 2;
                 } else {
-                    var w = this.w;
-                    var h = this.h;
-                    var x = this.x;
-                    var y = this.y;
+                    this.w = this.fullW;
+                    this.h = this.fullH;
+                    this.x = this.fullX;
+                    this.y = this.fullY;
                 }
 
-                //draw a shadow
-                fillRect(invColor, this.x, this.y, this.w, this.h);
-
                 //draw the trunk
-                fillRect(this.color, x, y, w, h);
+                fillRect(this.color, this.x, this.y, this.w, this.h);
 
                 //draw the leaves
-                fillTri(this.leafColor, x + (w / 2), y - (h / 1.5), w * 1.5, h);
+                fillTri(this.leafColor, this.x + (this.w / 2), this.y - (this.h / 1.5), this.w * 1.5, this.h);
             }
 
             update() {
@@ -753,7 +754,7 @@
                     player.setFacing('right');
                 }
 
-                if (within(keysJustUp, keys['interact'])) {
+                _: if (within(keysJustUp, keys['interact'])) {
                     //interact with the campFire
                     if (collide(player.getFace(), campFire)) {
                         campFire.addFuel();
@@ -764,7 +765,7 @@
 
                             if(collide(player.getFace(), b)) {
                                 b.pickBerry();
-                                break;
+                                break _;
                             }
                         }
 
@@ -774,7 +775,7 @@
 
                             if(collide(player.getFace(), t)) {
                                 t.harvest();
-                                break;
+                                break _;
                             }
                         }
 
@@ -784,7 +785,7 @@
 
                             if(collide(player.getFace(), l)) {
                                 l.collect();
-                                break;
+                                break _;
                             }
                         }
                     }
@@ -973,14 +974,9 @@
             bushes = [
                 new Bush(Math.ceil(width / 2 / blockSize - 3) * blockSize, Math.ceil(height / 2 / blockSize - 2) * blockSize),
                 new Bush(blockSize * 3, blockSize * 3),
-                new Bush(blockSize * 6, 0),
-                new Bush(blockSize * 7, blockSize * 10),
-                new Bush(blockSize * 12, blockSize * 9),
-                new Bush(blockSize * 15, blockSize * 4),
                 new Bush(blockSize * 20, blockSize * 2),
-                new Bush(blockSize * 19, blockSize * 8),
                 new Bush(blockSize * 24, blockSize * 9),
-                new Bush(blockSize * 16, blockSize * 13),
+                new Bush(blockSize * 16, blockSize * 13)
             ];
 
             window.onkeydown = function(e){
