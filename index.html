@@ -9,7 +9,7 @@
 <body>
     <div id="game_container" class="centered">
         <h1>The Forest</h1>
-        <h3>Alpha 1.2 — <a href="https://forms.gle/8AXVjWiLVwinWLBy7" target="_blank">Give Feedback</a></h3>
+        <h3>Alpha 1.3 — <a href="https://forms.gle/8AXVjWiLVwinWLBy7" target="_blank">Give Feedback</a></h3>
         <button id="startBtn" onclick="startGame();">Click to play!</button>
         <canvas id="canvas" width="1250vmin" height="700vmin">Loading...</canvas><br><br>
     </div>
@@ -41,7 +41,7 @@
         <h2>About The Forest</h2>
         <p>You're lost in the forest, with only a camp-fire to keep you warm. All you have to eat is berries, and your only source of water is a small pond. How long can you survive before thirst, hunger, or the weather kills you?</p>
         <p>Your vitals are on the bottom-left. In order, from top to bottom, they are: Warmth, Food, and Water. They will decrease as time goes on, but Food will decrease faster than Warmth, and Water faster than Food.</p>
-        <p>You can increase your Warmth meter by standing near the camp-fire while it's lit; make sure it has enough wood to burn! You can eat berries to increase your Food meter, and drink water from the pond to increase your Water meter.</p>
+        <p>You can increase your Warmth meter by standing near the camp-fire while it's lit; make sure it has enough wood to burn! You can eat berries to increase your Food meter, but the bushes need to be watered when they turn yellow! You can drink from the pond to increase your Water meter, or alternatively drink the water you're holding.</p>
         <p>On the top-right is your inventory. This will tell you how many berries you have, how much wood you've harvested, and whether or not you're holding water. You can only have 99 berries, 25 wood, and 1 water.</p>
     </div>
     </div>
@@ -738,7 +738,7 @@
                 } else {
                     paused = true;
                 }
-            } else {
+            } else if (!paused) {
 
                 if (within(currentKeys, keys['up'])){ 
                     player.setVel(0, -1);
@@ -882,7 +882,7 @@
 
             //show the time in seconds
             fillText('Time:', blockSize / 4, blockSize / 4, 'left', 'top')
-            fillText(readableTime(), blockSize / 4, blockSize / 1.5, 'left', 'top')
+            fillText(readableTime(), blockSize / 4, blockSize / 1.25, 'left', 'top')
 
             if (paused) {
                 //darken the screen
