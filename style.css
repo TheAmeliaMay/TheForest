@@ -38,6 +38,7 @@ button:hover {
 .column {
     float: left;
     width: 33%;
+    margin-right: 5%;
 }
 
 .row:after {
@@ -49,6 +50,27 @@ button:hover {
 .centered {
     text-align: center;
     align-items: center;
+}
+
+.tooltip {
+    display: inline;
+    border-bottom: 1px dotted;
+}
+
+.tooltiptext {
+    display: none;
+}
+
+.tooltip:hover .tooltiptext {
+    display: inline;
+    position: absolute;
+    top: 7%;
+    left: 22%;
+    width: 15%;
+
+    font-size: 1.75vmin;
+    font-style: italic;
+    text-align: left;
 }
 
 #canvas {
