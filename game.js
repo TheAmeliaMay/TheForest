@@ -503,7 +503,7 @@ class Player {
 class Fire {
     constructor(x, y, colors=fireColors) {
         this.x = x;
-        this.y = y;
+        this.fullY = this.y = y;
         this.w = this.h = blockSize;
 
         this.colors = colors;
@@ -515,14 +515,16 @@ class Fire {
     }
 
     draw() {
-        fillRect(this.color, this.x, this.y, this.w, this.h);
+        //fillRect(this.color, this.x, this.y, this.w, this.h);
+
+        //draw the fire
+        fillTri(this.color, this.x + this.w / 2, this.y, this.w, this.h);
+
+        //draw the wood
+        fillRect(woodColor, this.x, this.fullY + blockSize / 3 * 2, this.w, blockSize / 3);
     }
 
     update() {
-        if (this.fuel > 0) {
-            this.fuel --;
-        }
-
         var fuelPercent = this.fuel / this.maxFuel;
 
         if (Math.floor(fuelPercent * this.colors.length) == 0) {
@@ -531,7 +533,25 @@ class Fire {
             this.lit = true;
         }
 
-        this.color = this.colors[this.colors.length - 1 - Math.floor(fuelPercent * this.colors.length)]
+        this.color = this.colors[this.colors.length - 1 - Math.floor(fuelPercent * this.colors.length)];
+        this.h = blockSize * fuelPercent;
+        this.y = this.fullY - this.h + blockSize;
+
+        if (this.fuel > 0) {
+            this.fuel --;
+        }
+
+        //create embers
+        if (this.fuel % 20 == 0 && fuelPercent >= 0.2) {
+            particles.push(new Particle(this.x + (Math.random() * this.w), this.fullY + (Math.random() * (blockSize / 3 * 2)),
+                blockSize / 10, blockSize / 10, this.color, 100));
+        }
+
+        //create smoke
+        if (this.fuel % 50 == 0 && fuelPercent >= 0.2) {
+            particles.push(new Particle(this.x + (Math.random() * this.w), this.fullY - blockSize + (Math.random() * ((blockSize * 2) / 3 * 2)),
+                blockSize / (2 + (Math.random() * 2)), blockSize / (2 + (Math.random() * 2)), invColor, 500));
+        }
     }
 
     addFuel(n=1) {
@@ -542,6 +562,8 @@ class Fire {
                 if (this.fuel > this.maxFuel) {
                     this.fuel = this.maxFuel;
                 }
+                particles.push(new Particle(this.x + (Math.random() * this.w), this.fullY + (Math.random() * (blockSize / 3 * 2)),
+                    blockSize / 5, blockSize / 5, woodColor, 100));
             }
         }
     }
@@ -725,14 +747,44 @@ class Tree {
             var n = Math.ceil((this.age / this.fullAge) * 3);
         }
 
+        //create particles
+
+        for (let i = 0; i < n; i++) {
+            particles.push(new Particle(this.x + (Math.random() * this.w), this.fullY + (Math.random() * (blockSize / 3 * 2)),
+                blockSize / 5, blockSize / 5, woodColor, 100));
+        }
+
         player.inv.give('wood', n);
         this.age = 0;
+    }
+}
+
+class Particle {
+    constructor(x, y, w, h, color, timer) {
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
+
+        this.color = color;
+        this.timer = timer;
+    }
+
+    update() {
+        if (this.timer <= 0) { return }
+        this.timer --;
+    }
+
+    draw() {
+        if (this.timer <= 0) { return }
+        fillRect(this.color, this.x, this.y, this.w, this.h);
     }
 }
 
 //class arrays
 var blocks = blockEntities = trees = bushes = [];
 var liquids = [];
+var particles = [];
 
 var campFire = player = null;
 
@@ -894,6 +946,18 @@ function update() {
         for (let i = 0; i < trees.length; i++) {
             trees[i].update();
         }
+
+        //destroy all the dead particles
+        for (let i = particles.length - 1; i > -1; i--) {
+            if (particles[i].timer <= 0) {
+                particles.splice(i, 1);
+            }
+        }
+
+        //update the particles
+        for (let i = 0; i < particles.length; i++) {
+            particles[i].update();
+        }
     }
 
     //draw every block
@@ -920,6 +984,11 @@ function update() {
     //draw the trees
     for (let i = 0; i < trees.length; i++) {
         trees[i].draw();
+    }
+
+    //draw the particles
+    for (let i = 0; i < particles.length; i++) {
+        particles[i].draw();
     }
 
     //draw the inventory
@@ -969,6 +1038,8 @@ function startGame() {
             blocks.push(new Block(x * blockSize, y * blockSize, randChoice(blockColors)))
         }
     }
+
+    particle = new Block(0, 0, null);
 
     //create all the water
 
