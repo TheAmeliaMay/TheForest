@@ -113,11 +113,6 @@ function resetKeys() {
     keys = defaultKeys;
 }
 
-//return the correct pixel size, dependent on the scale
-function px(size) {
-    return Math.round(size * scale);
-}
-
 //check if a variable is present within an array
 function within(a, v) {
     if (a.indexOf(v) >= 0) {
@@ -143,31 +138,6 @@ function randChoice(a) {
 
 //choose a random berryColor
 const berryColor = randChoice(berryColors);
-
-//fill a rectangle
-function fillRect(color, x, y, w, h) {
-    ctx.fillStyle = color;
-    ctx.fillRect(x, y, w, h);
-}
-
-//fill a triangle
-function fillTri(color, x, y, w, h) {
-    var path = new Path2D();
-    path.moveTo(x, y);
-    path.lineTo(x + (w / 2), y + h);
-    path.lineTo(x - (w / 2), y + h);
-
-    ctx.fillStyle = color;
-    ctx.fill(path);
-}
-
-function fillText(text, x, y, textAlign='center', bLine='middle', size=30, color='#ffffff') { //color is white
-    ctx.font = size.toString() + 'px Georgia';
-    ctx.textAlign = textAlign;
-    ctx.textBaseline = bLine;
-    ctx.fillStyle = color;
-    ctx.fillText(text, x, y);
-}
 
 //return a string telling you the time
 function readableTime() {
@@ -197,10 +167,10 @@ class Dummy {
 //holds items
 class Inventory {
     constructor(berries=0, wood=0, water=0) {
-        this.x = width - px(300);
+        this.x = width - 300;
         this.y = 0;
-        this.w = px(300);
-        this.h = px(70);
+        this.w = 300;
+        this.h = 70;
 
         this.items = {
             'berries': berries,
@@ -246,38 +216,38 @@ class Inventory {
 
     draw() {
         //draw the background
-        fillRect(invColor, this.x, this.y, this.w, this.h);
+        rect(invColor, this.x, this.y, this.w, this.h);
 
         //draw each item
 
         //berries
-        var _ = new Dummy(this.x + px(10), this.y + px(10), blockSize, blockSize);
-        fillRect(berryColor, _.x, _.y, _.w, _.h);
+        var _ = new Dummy(this.x + 10, this.y + 10, blockSize, blockSize);
+        square(berryColor, _.x, _.y, _.w);
 
-        fillText(this.items['berries'].toString(), _.x + _.w / 2, _.y + _.h / 2 - px(10)); //ammount
-        fillText('Berries', _.x + _.w / 2, _.y + _.h / 2 + px(12), 'center', 'middle', 12);//label
+        drawTxt(WHITE, this.items['berries'].toString(), _.x + _.w / 2, _.y + _.h / 2 + 2, '30px Georgia', CLEAR, 1, 'center'); //ammount
+        drawTxt(WHITE, 'Berries', _.x + _.w / 2, _.y + _.h / 2 + 12, '15px Georgia', CLEAR, 1, 'center', 'middle', 12); //label
 
         //wood
-        var _ = new Dummy(this.x + px(10) + blockSize * 2, this.y +  px(10), blockSize, blockSize);
-        fillRect(woodColor, _.x, _.y, _.w, _.h);
+        var _ = new Dummy(this.x + 10 + blockSize * 2, this.y +  10, blockSize, blockSize);
+        square(woodColor, _.x, _.y, _.w);
 
-        fillText(this.items['wood'].toString(), _.x + _.w / 2, _.y + _.h / 2 - px(10)); //ammount
-        fillText('Wood', _.x + _.w / 2, _.y + _.h / 2 + px(12), 'center', 'middle', 12);//label
+        drawTxt(WHITE, this.items['wood'].toString(), _.x + _.w / 2, _.y + _.h / 2 + 2, '30px Georgia', CLEAR, 1, 'center'); //ammount
+        drawTxt(WHITE, 'Wood', _.x + _.w / 2, _.y + _.h / 2 + 12, '15px Georgia', CLEAR, 1, 'center', 'middle', 12); //label
 
         //water
-        var _ = new Dummy(this.x + px(10) + blockSize * 4, this.y +  px(10), blockSize, blockSize);
-        fillRect(waterColor, _.x, _.y, _.w, _.h);
+        var _ = new Dummy(this.x + 10 + blockSize * 4, this.y +  10, blockSize, blockSize);
+        square(waterColor, _.x, _.y, _.w);
 
-        fillText(this.items['water'].toString(), _.x + _.w / 2, _.y + _.h / 2 - px(10)); //ammount
-        fillText('Water', _.x + _.w / 2, _.y + _.h / 2 + px(12), 'center', 'middle', 12);//label
+        drawTxt(WHITE, this.items['water'].toString(), _.x + _.w / 2, _.y + _.h / 2 + 2, '30px Georgia', CLEAR, 1, 'center'); //ammount
+        drawTxt(WHITE, 'Water', _.x + _.w / 2, _.y + _.h / 2 + 12, '15px Georgia', CLEAR, 1, 'center', 'middle', 12); //label
     }
 }
 
 class Player {
     constructor() {
         this.w = this.h = playerSize;
-        this.x = Math.round((width / 2) - (this.w / 2)) - px(10);
-        this.y = Math.round((height / 2) - (this.h / 2)) + px(5);
+        this.x = Math.round((width / 2) - (this.w / 2)) - 10;
+        this.y = Math.round((height / 2) - (this.h / 2)) + 5;
 
         this.arm = [
             new Dummy(0, 0, 0 ,0),
@@ -313,7 +283,7 @@ class Player {
 
     draw() {
         //draw the square
-        fillRect(this.color, this.x, this.y, this.w, this.h);
+        rect(this.color, this.x, this.y, this.w, this.h);
 
         //get the arm's x and y
         if (this.facing == 'up' || this.facing == 'down') {
@@ -346,27 +316,27 @@ class Player {
         }
         
         //draw the arms
-        fillRect(this.armColor, this.arm[0].x, this.arm[0].y, this.arm[0].w, this.arm[0].h);
-        fillRect(this.armColor, this.arm[1].x, this.arm[1].y, this.arm[1].w, this.arm[1].h);
+        rect(this.armColor, this.arm[0].x, this.arm[0].y, this.arm[0].w, this.arm[0].h);
+        rect(this.armColor, this.arm[1].x, this.arm[1].y, this.arm[1].w, this.arm[1].h);
 
         //draw the vitals area
-        var barW = px(300);
+        var barW = 300;
         var labelColors = ['#ffffff', '#ffffff', '#ffffff'];
         if (this.waterAmnt < 50 && Math.round(this.waterAmnt) % 2 == 0) { labelColors[0] = '#000000' }
         if (this.foodAmnt < 50 && Math.round(this.foodAmnt) % 2 == 0) { labelColors[1] = '#000000' }
         if (this.warmthAmnt < 50 && Math.round(this.warmthAmnt) % 2 == 0) { labelColors[2] = '#000000' }
 
-        fillRect(invColor, 0, height - px(60), barW, px(60));
+        rect(invColor, 0, height - 60, barW, 60);
 
         //draw the vitals bars
-        fillRect(thirstColor, 0, height - px(20), barW * (this.waterAmnt / 100), px(20));
-        fillRect(foodColor, 0, height - px(40), barW * (this.foodAmnt / 100), px(20));
-        fillRect(warmthColor, 0, height - px(60), barW * (this.warmthAmnt / 100), px(20));
+        rect(thirstColor, 0, height - 20, barW * (this.waterAmnt / 100), 20);
+        rect(foodColor, 0, height - 40, barW * (this.foodAmnt / 100), 20);
+        rect(warmthColor, 0, height - 60, barW * (this.warmthAmnt / 100), 20);
 
         //draw labels
-        fillText('Water', px(10), height - px(10), 'left', 'middle', 20, labelColors[0]);
-        fillText('Food', px(10), height - px(30), 'left', 'middle', 20, labelColors[1]);
-        fillText('Warmth', px(10), height - px(50), 'left', 'middle', 20, labelColors[2]);
+        drawTxt(labelColors[0], 'Water', 10, height - 10, FONT, CLEAR, 1, 'left', 'middle');
+        drawTxt(labelColors[1], 'Food', 10, height - 30, FONT, CLEAR, 1, 'left', 'middle');
+        drawTxt(labelColors[2], 'Warmth', 10, height - 50, FONT, CLEAR, 1, 'left', 'middle');
     }
 
     update() {
@@ -515,13 +485,11 @@ class Fire {
     }
 
     draw() {
-        //fillRect(this.color, this.x, this.y, this.w, this.h);
-
         //draw the fire
-        fillTri(this.color, this.x + this.w / 2, this.y, this.w, this.h);
+        tri(this.color, this.x + this.w / 2, this.y, this.w, this.h);
 
         //draw the wood
-        fillRect(woodColor, this.x, this.fullY + blockSize / 3 * 2, this.w, blockSize / 3);
+        rect(woodColor, this.x, this.fullY + blockSize / 3 * 2, this.w, blockSize / 3);
     }
 
     update() {
@@ -608,19 +576,19 @@ class Bush {
             var color = dryBushColor;
         }
 
-        fillRect(color, this.x, this.y, this.w, this.h);
+        square(color, this.x, this.y, this.w);
 
         //draw the berries
         if (this.berries > 0) {
             var berryOffset = (this.w / 5);
-            fillRect(this.berryColor, this.x + berryOffset, this.y + berryOffset, berryOffset, berryOffset);
+            square(this.berryColor, this.x + berryOffset, this.y + berryOffset, berryOffset);
 
             if (this.berries > 1) {
-                fillRect(this.berryColor, this.x + this.w - (berryOffset * 2), this.y + this.h - (berryOffset * 3), berryOffset, berryOffset);
+                square(this.berryColor, this.x + this.w - (berryOffset * 2), this.y + this.h - (berryOffset * 3), berryOffset);
             }
 
             if (this.berries > 2) {
-                fillRect(this.berryColor, this.x + Math.round(berryOffset * 1.5), this.y + this.h - (berryOffset * 2), berryOffset, berryOffset);
+                square(this.berryColor, this.x + Math.round(berryOffset * 1.5), this.y + this.h - (berryOffset * 2), berryOffset);
             }
         }
     }
@@ -675,7 +643,7 @@ class Block {
     }
 
     draw() {
-        fillRect(this.color, this.x, this.y, this.w, this.h);
+        square(this.color, this.x, this.y, this.w);
     }
 }
 
@@ -689,7 +657,7 @@ class Liquid {
     }
 
     draw() {
-        fillRect(this.color, this.x, this.y, this.w, this.h);
+        square(this.color, this.x, this.y, this.w);
     }
 
     collect() {
@@ -730,10 +698,10 @@ class Tree {
         }
 
         //draw the trunk
-        fillRect(this.color, this.x, this.y, this.w, this.h);
+        rect(this.color, this.x, this.y, this.w, this.h);
 
         //draw the leaves
-        fillTri(this.leafColor, this.x + (this.w / 2), this.y - (this.h / 1.5), this.w * 1.5, this.h);
+        tri(this.leafColor, this.x + (this.w / 2), this.y - (this.h / 1.5), this.w * 1.5, this.h);
     }
 
     update() {
@@ -777,7 +745,7 @@ class Particle {
 
     draw() {
         if (this.timer <= 0) { return }
-        fillRect(this.color, this.x, this.y, this.w, this.h);
+        rect(this.color, this.x, this.y, this.w, this.h);
     }
 }
 
@@ -788,8 +756,7 @@ var particles = [];
 
 var campFire = player = null;
 
-//called every ms
-function update() {
+function draw() {
     //check each key
     if (within(keysJustUp, keys['pause'])) {
         if (paused) {
@@ -918,9 +885,6 @@ function update() {
 
         time ++;
 
-        //clear the screen
-        fillRect(bgColor, 0, 0, width, height);
-
         //if the player is dead, stop the game
         if (player.dead) { window.location.href = window.location.href; return false; }
 
@@ -995,12 +959,12 @@ function update() {
     player.inv.draw();
 
     //show the time in seconds
-    fillText('Time:', blockSize / 4, blockSize / 4, 'left', 'top')
-    fillText(readableTime(), blockSize / 4, blockSize / 1.25, 'left', 'top')
+    drawTxt(WHITE, 'Time:', blockSize / 4, blockSize / 4, FONT, CLEAR, 1, 'left', 'top');
+    drawTxt(WHITE, readableTime(), blockSize / 4, blockSize / 1.25, FONT, CLEAR, 1, 'left', 'top');
 
     if (paused) {
         //darken the screen
-        fillRect(invColor, 0, 0, width, height);
+        rect(invColor, 0, 0, width, height);
     }
 }
 
@@ -1024,10 +988,10 @@ function startGame() {
     scale = Math.round(width / 1250);
 
     //pre-defined px values
-    playerSize = blockSize = px(50);
+    playerSize = blockSize = 50;
 
     //draw temporary loading text
-    fillText('Loading...', width / 2, height / 2);
+    drawTxt(WHITE, 'Loading...', width / 2, height / 2);
 
     //create the player
     player = new Player();
@@ -1112,6 +1076,8 @@ function startGame() {
         });
     };
 
-    //start the update loop
-    setInterval(update, 1);
-};
+    //set the font
+    setFONT('20px Georgia');
+
+    //initialize draw.js
+    init();};
