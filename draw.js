@@ -37,6 +37,16 @@ function init() {
     setInterval(update, 1);
 }
 
+//rotate the canvas
+function rot(angle) {
+    ctx.rotate(angle);
+}
+
+//reset the canvas's rotation
+function resetRot() {
+    ctx.resetTransform();
+}
+
 //draw a rectangle on the canvas
 function rect(fill, x, y, w, h, stroke=CLEAR, line=1) {
     ctx.fillStyle = fill;
